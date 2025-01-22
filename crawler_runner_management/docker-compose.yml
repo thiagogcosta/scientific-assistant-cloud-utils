@@ -1,0 +1,23 @@
+services:
+  airflow:
+    container_name: airflow
+    image: airflow
+    restart: on-failure
+    build: airflow
+    user: root
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./model:/model
+      - ./airflow/start_airflow.sh:/start_airflow.sh
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: bash /start_airflow.sh
+    environment:
+      CRAWLER_VERSION: "1.0.12"
+      CHROMA_HOST: "54.226.246.31"
+      MAX_JOURNAL_NUMBER: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://airflow:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    network_mode: host
